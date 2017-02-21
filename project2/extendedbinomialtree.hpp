@@ -5,7 +5,7 @@
  Copyright (C) 2003 Ferdinando Ametrano
  Copyright (C) 2005 StatPro Italia srl
  Copyright (C) 2008 John Maiden
-
+  
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
 
@@ -30,8 +30,13 @@
 #include <ql/methods/lattices/tree.hpp>
 #include <ql/instruments/dividendschedule.hpp>
 #include <ql/stochasticprocess.hpp>
+#include <iostream>
+#include <map>
+#include "cache.hpp"
+
 
 namespace QuantLib {
+
 
     //! Binomial tree base class
     /*! \ingroup lattices */
@@ -43,10 +48,11 @@ namespace QuantLib {
                         const boost::shared_ptr<StochasticProcess1D>& process,
                         Time end,
                         Size steps)
-        : Tree<T>(steps+1), treeProcess_(process) {
+        : Tree<T>(steps+1), treeProcess_(process),driftStepCache([this](Time t){return driftStep(t);}){
             x0_ = process->x0();
             dt_ = end/steps;
             driftPerStep_ = process->drift(0.0, x0_) * dt_;
+ 
         }
         Size size(Size i) const {
             return i+1;
@@ -65,6 +71,7 @@ namespace QuantLib {
 
       protected:
         boost::shared_ptr<StochasticProcess1D> treeProcess_;
+        Cache<Time, Real> driftStepCache;
     };
 
 
@@ -78,20 +85,21 @@ namespace QuantLib {
                         const boost::shared_ptr<StochasticProcess1D>& process,
                         Time end,
                         Size steps)
-        : ExtendedBinomialTree_2<T>(process, end, steps) {}
+        : ExtendedBinomialTree_2<T>(process, end, steps),upStepCache([this](Time t){return this->upStep(t);}) {}
         virtual ~ExtendedEqualProbabilitiesBinomialTree_2() {}
 
         Real underlying(Size i, Size index) const {
             Time stepTime = i*this->dt_;
-            BigInteger j = 2*BigInteger(index) - BigInteger(i);
+            BigInteger j = 2*BigInteger(index) - BigInteger(i);        
             // exploiting the forward value tree centering
-            return this->x0_*std::exp(i*this->driftStep(stepTime) + j*this->upStep(stepTime));
+            return this->x0_*std::exp(i*this->driftStepCache(stepTime) + j*this->upStepCache(stepTime));
         }
 
         Real probability(Size, Size, Size) const { return 0.5; }
       protected:
         //the tree dependent up move term at time stepTime
         virtual Real upStep(Time stepTime) const = 0;
+        Cache<Time, Real> upStepCache;
         Real up_;
     };
 
@@ -105,12 +113,12 @@ namespace QuantLib {
                         const boost::shared_ptr<StochasticProcess1D>& process,
                         Time end,
                         Size steps)
-        : ExtendedBinomialTree_2<T>(process, end, steps) {}
+        : ExtendedBinomialTree_2<T>(process, end, steps),dxStepCache([this](Time t){return this->dxStep(t);}),probUpCache([this](Time t){return this->probUp(t);}) {}
         virtual ~ExtendedEqualJumpsBinomialTree_2() {}
 
         Real underlying(Size i, Size index) const {
             Time stepTime = i*this->dt_;
-            BigInteger j = 2*BigInteger(index) - BigInteger(i);
+            BigInteger j = 2*BigInteger(index) - BigInteger(i);  
             // exploiting equal jump and the x0_ tree centering
             return this->x0_*std::exp(j*this->dxStep(stepTime));
         }
@@ -128,6 +136,8 @@ namespace QuantLib {
         virtual Real dxStep(Time stepTime) const = 0;
 
         Real dx_, pu_, pd_;
+        Cache<Time, Real> dxStepCache;
+        Cache<Time, Real> probUpCache;
     };
 
 
@@ -142,6 +152,7 @@ namespace QuantLib {
                              Real strike);
       protected:
         Real upStep(Time stepTime) const;
+        
     };
 
 
