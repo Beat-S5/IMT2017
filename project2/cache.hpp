@@ -1,6 +1,8 @@
 #ifndef cache_hpp
 #define cache_hpp
 
+#include <functional>
+
 	template<class X, class Y>
 	class Cache
 	{
