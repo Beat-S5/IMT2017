@@ -120,12 +120,12 @@ namespace QuantLib {
             Time stepTime = i*this->dt_;
             BigInteger j = 2*BigInteger(index) - BigInteger(i);  
             // exploiting equal jump and the x0_ tree centering
-            return this->x0_*std::exp(j*this->dxStep(stepTime));
+            return this->x0_*std::exp(j*this->dxStepCache(stepTime));
         }
 
         Real probability(Size i, Size, Size branch) const {
             Time stepTime = i*this->dt_;
-            Real upProb = this->probUp(stepTime);
+            Real upProb = this->probUpCache(stepTime);
             Real downProb = 1 - upProb;
             return (branch == 1 ? upProb : downProb);
         }
