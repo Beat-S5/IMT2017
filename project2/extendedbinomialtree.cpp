@@ -109,7 +109,7 @@ namespace QuantLib {
 
         Real q = std::exp(process->variance(0.0, x0_, dt_));
 
-        Real r = std::exp(this->driftStep(0.0))*std::sqrt(q);
+        Real r = std::exp(this->driftStepCache(0.0))*std::sqrt(q);
 
         up_ = 0.5 * r * q * (q + 1 + std::sqrt(q * q + 2 * q - 3));
         down_ = 0.5 * r * q * (q + 1 - std::sqrt(q * q + 2 * q - 3));
