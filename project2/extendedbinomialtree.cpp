@@ -30,6 +30,7 @@ namespace QuantLib {
     }
 
     Real ExtendedJarrowRudd_2::upStep(Time stepTime) const {
+	nb++;
         return treeProcess_->stdDeviation(stepTime, x0_, dt_);
     }
 
@@ -50,10 +51,12 @@ namespace QuantLib {
     }
 
     Real ExtendedCoxRossRubinstein_2::dxStep(Time stepTime) const {
+	nb++;
         return this->treeProcess_->stdDeviation(stepTime, x0_, dt_);
     }
 
     Real ExtendedCoxRossRubinstein_2::probUp(Time stepTime) const {
+	nb++;
         return 0.5 + 0.5*this->driftStepCache(stepTime)/dxStepCache(stepTime);
     }
 
@@ -70,6 +73,7 @@ namespace QuantLib {
     }
 
     Real ExtendedAdditiveEQPBinomialTree_2::upStep(Time stepTime) const {
+	nb++;
         return (- 0.5 * this->driftStepCache(stepTime) + 0.5 *
             std::sqrt(4.0*this->treeProcess_->variance(stepTime, x0_, dt_)-
             3.0*this->driftStepCache(stepTime)*this->driftStepCache(stepTime)));
@@ -93,11 +97,13 @@ namespace QuantLib {
     }
 
     Real ExtendedTrigeorgis_2::dxStep(Time stepTime) const {
+	nb++;
         return std::sqrt(this->treeProcess_->variance(stepTime, x0_, dt_)+
             this->driftStepCache(stepTime)*this->driftStepCache(stepTime));
     }
 
     Real ExtendedTrigeorgis_2::probUp(Time stepTime) const {
+	nb++;
         return 0.5 + 0.5*this->driftStepCache(stepTime)/dxStepCache(stepTime);
     }
 
