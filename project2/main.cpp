@@ -1,4 +1,3 @@
-
 #include "extendedbinomialtree.hpp"
 #include <ql/quantlib.hpp>
 #include <ql/pricingengines/vanilla/binomialengine.hpp>
@@ -11,6 +10,20 @@
 using namespace QuantLib;
 
 double time_elapse(std::clock_t c);
+template<>
+long long ExtendedBinomialTree_2<ExtendedJarrowRudd_2>::nb = 0;
+template<>
+long long ExtendedBinomialTree_2<ExtendedCoxRossRubinstein_2>::nb = 0;
+template<>
+long long ExtendedBinomialTree_2<ExtendedAdditiveEQPBinomialTree_2>::nb = 0;
+template<>
+long long ExtendedBinomialTree_2<ExtendedTrigeorgis_2>::nb = 0;
+template<>
+long long ExtendedBinomialTree_2<ExtendedTian_2>::nb = 0;
+template<>
+long long ExtendedBinomialTree_2<ExtendedLeisenReimer_2>::nb = 0;
+template<>
+long long ExtendedBinomialTree_2<ExtendedJoshi4_2>::nb = 0;
 
 int main() {
  
@@ -19,6 +32,8 @@ int main() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////Init////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	
 
 	std::clock_t    start;
 	std::clock_t    step;
@@ -42,7 +57,7 @@ int main() {
         Volatility volatility = 0.20;
         Date maturity(17, May, 1999);
         DayCounter dayCounter = Actual365Fixed();
-	Size timeSteps = 2000;
+	Size timeSteps = 1000;
 	Time t = 0;
 
 	double europeanOptionNPV = 0.0;
@@ -425,7 +440,25 @@ int main() {
 	time[0] = time_elapse(start);
 	std::cout << std::endl;
      	std::cout << "Time: " << time[0] << " ms" << std::endl;
+	std::cout << std::endl;
 
+	std::cout << std::setw(widths[0]) << std::left << "Effective go through function: (including driftStep, upStep, probUp and dxStep)"<< std::endl;
+
+	std::cout << std::setw(widths[0]) << std::left << "ExtendedJarrowRudd_2 "<< std::fixed
+                  << std::setw(widths[1]) << std::right << ExtendedBinomialTree_2<ExtendedJarrowRudd_2>::getNb() << std::endl;
+	std::cout << std::setw(widths[0]) << std::left << "ExtendedCoxRossRubinstein_2 " << std::fixed
+                  << std::setw(widths[1]) << std::right << ExtendedBinomialTree_2<ExtendedCoxRossRubinstein_2>::getNb() << std::endl;
+	std::cout << std::setw(widths[0]) << std::left << "ExtendedAdditiveEQPBinomialTree_2 " << std::fixed
+                  << std::setw(widths[1]) << std::right << ExtendedBinomialTree_2<ExtendedAdditiveEQPBinomialTree_2>::getNb() << std::endl;
+	std::cout << std::setw(widths[0]) << std::left << "ExtendedTrigeorgis_2 " << std::fixed
+                  << std::setw(widths[1]) << std::right << ExtendedBinomialTree_2<ExtendedTrigeorgis_2>::getNb() << std::endl;
+	std::cout << std::setw(widths[0]) << std::left << "ExtendedTian_2 " << std::fixed
+                  << std::setw(widths[1]) << std::right << ExtendedBinomialTree_2<ExtendedTian_2>::getNb() << std::endl;
+	std::cout << std::setw(widths[0]) << std::left << "ExtendedLeisenReimer_2 " << std::fixed
+                  << std::setw(widths[1]) << std::right << ExtendedBinomialTree_2<ExtendedLeisenReimer_2>::getNb() << std::endl;
+	std::cout << std::setw(widths[0]) << std::left << "ExtendedJoshi4_2 " << std::fixed
+                  << std::setw(widths[1]) << std::right << ExtendedBinomialTree_2<ExtendedJoshi4_2>::getNb() << std::endl;
+	
         return 0;
 
     } catch (std::exception& e) {
