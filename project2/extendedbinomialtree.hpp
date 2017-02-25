@@ -60,9 +60,13 @@ namespace QuantLib {
         Size descendant(Size, Size index, Size branch) const {
             return index + branch;
         }
+        static long long getNb(){
+            return nb;        
+        }
       protected:
         //time dependent drift per step
         Real driftStep(Time driftTime) const {
+            nb++;
             return this->treeProcess_->drift(driftTime, x0_) * dt_;
         }
 
@@ -72,6 +76,9 @@ namespace QuantLib {
       protected:
         boost::shared_ptr<StochasticProcess1D> treeProcess_;
         Cache<Time, Real> driftStepCache;
+
+      protected:
+        static long long nb;
     };
 
 
@@ -114,7 +121,7 @@ namespace QuantLib {
                         Time end,
                         Size steps)
         : ExtendedBinomialTree_2<T>(process, end, steps),dxStepCache([this](Time t){return this->dxStep(t);}),probUpCache([this](Time t){return this->probUp(t);}) {}
-        virtual ~ExtendedEqualJumpsBinomialTree_2() {}
+        virtual ~ExtendedEqualJumpsBinomialTree_2() {} 
 
         Real underlying(Size i, Size index) const {
             Time stepTime = i*this->dt_;
